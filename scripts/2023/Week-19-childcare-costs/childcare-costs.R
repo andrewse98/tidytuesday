@@ -133,7 +133,7 @@ mla3_data |>
     legend.text = element_text(size = 48)
   )
 
-ggsave("scripts/2023/Week-19-childcare-costs/childcare-costs.png", height = 12, width = 18)
+ggsave("scripts/2023/Week-19-childcare-costs/childcare-costs.png", height = 12, width = 18, dpi = 72)
 
 # 🔗 Link ----------------------------------------------------------------------
 
