@@ -1,6 +1,7 @@
 # 📚 Library -------------------------------------------------------------------
 
 library(lme4)
+library(glue)
 library(ggtext)
 library(showtext)
 library(tidyverse)
@@ -17,6 +18,7 @@ counties <- dat$counties
 bg <- "grey12"
 txt <- "#FFFFFF"
 
+font_add("fa-brands", regular = "ext/Font Awesome 6 Brands-Regular-400.otf")
 font_add_google("Roboto")
 showtext_auto()
 
@@ -77,6 +79,10 @@ mla3_data <- left_join(df_costs, mla3_coef, by = "state_name")
 
 # 🔤 Text ----------------------------------------------------------------------
 
+twitter <- glue("<span style='font-family:fa-brands; color:{txt}'>&#xf099;</span>")
+github <- glue("<span style='font-family:fa-brands; color:{txt}'>&#xf09b;</span>")
+caption <- glue("{twitter} @setiono_andrew • {github} andrewse98/tidytuesday")
+
 main_title <- "Relationsip between County's Population and
 Center-based Childcare Costs per State"
 
@@ -108,7 +114,8 @@ mla3_data |>
     title    = main_title,
     subtitle = subtitle,
     x        = x_title,
-    color    = legend_title
+    color    = legend_title,
+    caption  = caption
   ) +
   theme_void() +
   theme(
