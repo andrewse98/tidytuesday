@@ -46,9 +46,7 @@ df_costs <- costs |>
   drop_na() |>
   mutate(log_pop = log(total_pop)) |>
   group_by(state_name) |>
-  mutate(mean_log_pop = mean(log_pop, na.rm = TRUE)) |>
-  ungroup() |>
-  mutate(cen_log_pop = log_pop - mean_log_pop)  # group centered log population
+  mutate(cen_log_pop = log_pop - mean(log_pop, na.rm = TRUE))  # group centered log population
 
 # simple multilevel model
   ## empty model
@@ -69,13 +67,26 @@ df_costs <- costs |>
   mla3 <- lmer(mcsa ~ cen_log_pop + (1 + cen_log_pop|state_name),
                data = df_costs, REML = FALSE)
 
+  ## level-1 fixed effect without centering
+  mla2a <- lmer(mcsa ~ log_pop + (1|state_name),
+                data = df_costs, REML = FALSE)
+
+  ## random slope model without centering
+  mla3a <- lmer(mcsa ~ log_pop + (1 + log_pop|state_name),
+                data = df_costs, REML = FALSE)
+
 # random slope model coefficient
 mla3_coef <- coef(mla3)$state_name |>
   rename(intercept = `(Intercept)`, slope = cen_log_pop) |>
   rownames_to_column("state_name")
 
+mla3a_coef <- coef(mla3a)$state_name |>
+  rename(intercept2 = `(Intercept)`, slope2 = log_pop) |>
+  rownames_to_column("state_name")
+
 # prep data for mixed model
-mla3_data <- left_join(df_costs, mla3_coef, by = "state_name")
+mla3_data <-
+  left_join(df_costs, mla3_coef, by = "state_name")
 
 # 🔤 Text ----------------------------------------------------------------------
 
@@ -133,7 +144,7 @@ mla3_data |>
     legend.text = element_text(size = 48)
   )
 
-ggsave("scripts/2023/Week-19-childcare-costs/childcare-costs.png", height = 12, width = 18, dpi = 72)
+# ggsave("scripts/2023/Week-19-childcare-costs/childcare-costs.png", height = 13, width = 21)
 
 # 🔗 Link ----------------------------------------------------------------------
 
