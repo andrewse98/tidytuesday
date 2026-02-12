@@ -25,3 +25,13 @@ schedule |>
     x = "",
     y = "# of events"
   )
+
+schedule |>
+  filter(discipline_name == "Curling") |>
+  mutate(duration = difftime(end_time, start_time, units = "mins")) |>
+  group_by(event_description) |>
+  summarise(
+    n_event = n(),
+    avg_duration = mean(duration)
+  ) |>
+  print(n = Inf)
