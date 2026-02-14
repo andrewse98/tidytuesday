@@ -10,9 +10,41 @@ events <- schedule |>
 
 events |> sample_n(10)
 
+schedule_df <- schedule |>
+  mutate(
+    duration = difftime(end_time, start_time, units = "mins"),
+    event_gender_code = str_extract(event_code, "CUR(M|X|W)TEAM", group = 1),
+    event_gender = case_when(
+      event_gender_code == "M" ~ "Men",
+      event_gender_code == "W" ~ "Women",
+      event_gender_code == "X" ~ "Mixed",
+      .default = NA_character_
+    ),
+    event_stage_code = str_extract(
+      event_code,
+      "-([A-Z]+)(?:\\d|-)",
+      group = 1
+    ),
+    event_stage = case_when(
+      event_stage_code == "PREL" ~ "Preliminary",
+      event_stage_code == "HEAT" ~ "Heat",
+      event_stage_code == "QUAL" ~ "Qualifier",
+      event_stage_code == "8FNL" ~ "One-eight final",
+      event_stage_code == "QFNL" ~ "Quarterfinal",
+      event_stage_code == "SFNL" ~ "Semifinal",
+      event_stage_code == "FNL" ~ "Final",
+      .default = NA_character_
+    )
+  )
+
+schedule_df |>
+  pull(event_stage_code) |>
+  unique()
+
+
 # Events may have multiple days or stretches across multiple occurences:
 
-schedule |>
+schedule_df |>
   group_by(discipline_name) |>
   count() |>
   ungroup() |>
@@ -25,13 +57,3 @@ schedule |>
     x = "",
     y = "# of events"
   )
-
-schedule |>
-  filter(discipline_name == "Curling") |>
-  mutate(duration = difftime(end_time, start_time, units = "mins")) |>
-  group_by(event_description) |>
-  summarise(
-    n_event = n(),
-    avg_duration = mean(duration)
-  ) |>
-  print(n = Inf)
